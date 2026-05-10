@@ -1,0 +1,2721 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iStoryToon — 나의 이야기를, 나만의 만화로</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       DESIGN TOKENS
+    ============================================= */
+    :root {
+      --bg-primary:    #F0F8FF;
+      --bg-secondary:  #E8F4FD;
+      --bg-card:       #FFFFFF;
+      --bg-card-hover: #EBF5FF;
+      --border:        rgba(56, 152, 236, 0.18);
+      --border-hover:  rgba(56, 152, 236, 0.40);
+
+      --grad-start:    #38A8F5;
+      --grad-end:      #7C3AED;
+      --grad-main:     linear-gradient(135deg, #38A8F5, #7C3AED);
+      --grad-main-r:   linear-gradient(135deg, #7C3AED, #38A8F5);
+      --grad-subtle:   linear-gradient(135deg, rgba(56,168,245,0.12), rgba(124,58,237,0.10));
+      --grad-glow:     linear-gradient(135deg, rgba(56,168,245,0.25), rgba(124,58,237,0.20));
+
+      --text-primary:   #0F1923;
+      --text-secondary: #3D5A73;
+      --text-muted:     #7FA3BF;
+      --text-accent:    #1A7FD4;
+
+      --font-kr: 'Pretendard', 'Inter', sans-serif;
+      --font-en: 'Inter', sans-serif;
+
+      --radius-sm:  8px;
+      --radius-md:  12px;
+      --radius-lg:  20px;
+      --radius-xl:  28px;
+      --radius-full: 9999px;
+
+      --shadow-card:  0 4px 24px rgba(56, 152, 236, 0.10);
+      --shadow-glow:  0 0 40px rgba(56, 168, 245, 0.20);
+      --shadow-pink:  0 0 40px rgba(124, 58, 237, 0.15);
+
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+      --max-w: 1200px;
+      --section-py: 120px;
+    }
+
+    /* =============================================
+       RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-kr);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; outline: none; font-family: inherit; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* =============================================
+       PARTICLES BACKGROUND
+    ============================================= */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--grad-main);
+      opacity: 0;
+      animation: particleFloat linear infinite;
+    }
+
+    @keyframes particleFloat {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 0.20; }
+      90%  { opacity: 0.10; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    /* Star dots */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: rgba(56, 152, 236, 0.4);
+      animation: starTwinkle ease-in-out infinite alternate;
+    }
+    @keyframes starTwinkle {
+      from { opacity: 0.1; transform: scale(0.8); }
+      to   { opacity: 0.8; transform: scale(1.2); }
+    }
+
+    /* =============================================
+       HEADER / NAV
+    ============================================= */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 0 24px;
+      transition: var(--transition);
+    }
+
+    .header.scrolled {
+      background: rgba(240, 248, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 32px rgba(56,152,236,0.12);
+    }
+
+    .nav {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .nav-logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--grad-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-logo span.emoji {
+      -webkit-text-fill-color: initial;
+      font-size: 24px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+      background: rgba(56,152,236,0.07);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--grad-main);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124,58,237,0.5);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: rgba(56,152,236,0.07);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: rgba(56,152,236,0.12);
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-lg {
+      padding: 16px 32px;
+      font-size: 16px;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-secondary);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    /* =============================================
+       HERO SECTION
+    ============================================= */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 72px;
+    }
+
+    .hero-bg-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    .hero-glow-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(124,58,237,0.2) 0%, transparent 70%);
+      top: -100px;
+      left: -200px;
+    }
+    .hero-glow-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%);
+      bottom: -50px;
+      right: -100px;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      padding: 80px 0;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-accent);
+      margin-bottom: 24px;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--grad-main);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+    }
+
+    .hero-title .gradient-text {
+      background: var(--grad-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-item .stat-num {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--grad-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-item .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* =============================================
+       HERO COMIC MOCKUP
+    ============================================= */
+    .hero-mockup {
+      position: relative;
+      height: 520px;
+    }
+
+    .comic-frame {
+      position: absolute;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-card);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      animation: floatAnim ease-in-out infinite alternate;
+    }
+
+    @keyframes floatAnim {
+      from { transform: translateY(0px); }
+      to   { transform: translateY(-12px); }
+    }
+
+    @keyframes floatAnim2 {
+      from { transform: translateY(0px) rotate(-2deg); }
+      to   { transform: translateY(-8px) rotate(-2deg); }
+    }
+
+    @keyframes floatAnim3 {
+      from { transform: translateY(0px) rotate(3deg); }
+      to   { transform: translateY(-10px) rotate(3deg); }
+    }
+
+    .comic-panel-main {
+      width: 280px;
+      height: 340px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-duration: 4s;
+      background: linear-gradient(145deg, #1a0a2e, #2d1060);
+      z-index: 3;
+      border-color: rgba(124,58,237,0.5);
+      box-shadow: 0 0 40px rgba(124,58,237,0.3);
+    }
+
+    .comic-panel-sm1 {
+      width: 160px;
+      height: 120px;
+      top: 20px;
+      right: 0;
+      animation: floatAnim2 3.5s ease-in-out infinite alternate;
+      background: linear-gradient(145deg, #E8F4FF, #D0E8FF);
+      z-index: 2;
+    }
+
+    .comic-panel-sm2 {
+      width: 160px;
+      height: 120px;
+      bottom: 30px;
+      left: 0;
+      animation: floatAnim3 5s ease-in-out infinite alternate;
+      background: linear-gradient(145deg, #1a0a2e, #1a0f30);
+      z-index: 2;
+    }
+
+    .comic-panel-sm3 {
+      width: 130px;
+      height: 100px;
+      bottom: 60px;
+      right: -10px;
+      animation: floatAnim 3s ease-in-out infinite alternate;
+      background: linear-gradient(145deg, #EEF6FF, #FFE8F4);
+      z-index: 2;
+    }
+
+    .panel-emoji {
+      font-size: 48px;
+      line-height: 1;
+    }
+    .panel-emoji-sm {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .panel-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .comic-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .comic-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    .panel-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 0 16px;
+    }
+
+    .panel-lines {
+      width: 100%;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .panel-line {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(56,152,236,0.09);
+    }
+    .panel-line:first-child { width: 80%; }
+    .panel-line:nth-child(2) { width: 65%; }
+
+    /* =============================================
+       SECTION COMMON
+    ============================================= */
+    .section {
+      padding: var(--section-py) 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-accent);
+      margin-bottom: 16px;
+    }
+    .section-label::before {
+      content: '';
+      width: 20px;
+      height: 2px;
+      background: var(--grad-main);
+      border-radius: 2px;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .section-header .section-desc {
+      margin: 0 auto;
+    }
+
+    /* Scroll animation classes */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+
+    /* =============================================
+       HOW IT WORKS
+    ============================================= */
+    #how {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .step-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--grad-subtle);
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .step-card:hover {
+      border-color: rgba(124,58,237,0.4);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+    .step-card:hover::before { opacity: 1; }
+
+    .step-num {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: var(--grad-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    .step-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      background: var(--grad-subtle);
+      border: 1px solid rgba(124,58,237,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    .step-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    /* Mockup inside step card */
+    .step-mockup {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mockup-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .mockup-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .mockup-textarea {
+      background: rgba(56,152,236,0.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      min-height: 60px;
+    }
+    .mockup-textarea .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 14px;
+      background: var(--grad-start);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .mockup-upload-zone {
+      border: 2px dashed rgba(124,58,237,0.3);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .mockup-upload-zone .upload-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .mockup-progress {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .progress-bar-wrap {
+      background: rgba(56,152,236,0.06);
+      border-radius: var(--radius-full);
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: var(--grad-main);
+      animation: progressFill 2s ease-in-out infinite alternate;
+    }
+    @keyframes progressFill {
+      from { width: 40%; }
+      to   { width: 90%; }
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mockup-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .mini-panel {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .mini-panel-1 { background: linear-gradient(135deg, #1a0a2e, #2d1060); }
+    .mini-panel-2 { background: linear-gradient(135deg, #B8D8FF, #90C0FF); }
+    .mini-panel-3 { background: linear-gradient(135deg, #1a0a1a, #3d0a30); }
+    .mini-panel-4 { background: linear-gradient(135deg, #D0F0D8, #B8E8C8); }
+
+    /* =============================================
+       STYLE SELECTOR
+    ============================================= */
+    #styles {
+      overflow: hidden;
+    }
+
+    .style-tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 48px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 6px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .style-tab {
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .style-tab:hover { color: var(--text-primary); }
+    .style-tab.active {
+      background: var(--grad-main);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+    }
+
+    .style-panels {
+      position: relative;
+    }
+
+    .style-panel {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .style-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .style-info { }
+
+    .style-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .badge-romance { background: rgba(236,72,153,0.15); color: #F472B6; border: 1px solid rgba(236,72,153,0.3); }
+    .badge-webtoon { background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); }
+    .badge-disney  { background: rgba(245,158,11,0.15); color: #FCD34D; border: 1px solid rgba(245,158,11,0.3); }
+
+    .style-title { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+
+    .style-desc { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 28px; }
+
+    .style-features {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .style-feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .style-feature::before {
+      content: '✓';
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--grad-main);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .style-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      height: 400px;
+    }
+
+    .style-preview-cell {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 36px;
+      transition: var(--transition);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .style-preview-cell:hover {
+      transform: scale(1.03);
+      border-color: rgba(124,58,237,0.4);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .cell-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Romance style colors */
+    .romance .style-preview-cell:nth-child(1) { background: linear-gradient(145deg, #2d0a3a, #5a1060); grid-column: span 2; font-size: 48px; }
+    .romance .style-preview-cell:nth-child(2) { background: linear-gradient(145deg, #1a0a2e, #3d1060); }
+    .romance .style-preview-cell:nth-child(3) { background: linear-gradient(145deg, #2d0a20, #4d0a40); }
+
+    /* Webtoon style colors */
+    .webtoon .style-preview-cell:nth-child(1) { background: linear-gradient(145deg, #CCE8FF, #B0D8FF); grid-column: span 2; font-size: 48px; }
+    .webtoon .style-preview-cell:nth-child(2) { background: linear-gradient(145deg, #E8EEFF, #D8E4FF); }
+    .webtoon .style-preview-cell:nth-child(3) { background: linear-gradient(145deg, #D8EEFF, #C8E0FF); }
+
+    /* Disney style colors */
+    .disney .style-preview-cell:nth-child(1) { background: linear-gradient(145deg, #2d1a0a, #5a3010); grid-column: span 2; font-size: 48px; }
+    .disney .style-preview-cell:nth-child(2) { background: linear-gradient(145deg, #1a1a0a, #3d3010); }
+    .disney .style-preview-cell:nth-child(3) { background: linear-gradient(145deg, #D0F0F0, #B8E8E8); }
+
+    /* =============================================
+       GALLERY
+    ============================================= */
+    #gallery {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .gallery-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .gallery-card:hover {
+      transform: scale(1.04) translateY(-4px);
+      border-color: rgba(124,58,237,0.4);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .gallery-thumb {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      position: relative;
+      overflow: hidden;
+    }
+    .gallery-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 60%, rgba(10,10,15,0.8));
+    }
+
+    .gallery-info {
+      padding: 14px 16px;
+    }
+
+    .gallery-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .gallery-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .gallery-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+    }
+    .badge-romance-sm { background: rgba(236,72,153,0.15); color: #F472B6; }
+    .badge-webtoon-sm { background: rgba(59,130,246,0.15); color: #60A5FA; }
+    .badge-disney-sm  { background: rgba(245,158,11,0.15); color: #FCD34D; }
+    .badge-romance-sm2 { background: rgba(124,58,237,0.15); color: #C084FC; }
+
+    .gallery-cuts {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Gallery thumb backgrounds */
+    .gt-1 { background: linear-gradient(145deg, #2d0a3a, #5a1060); }
+    .gt-2 { background: linear-gradient(145deg, #CCE8FF, #B0D8FF); }
+    .gt-3 { background: linear-gradient(145deg, #2d1a0a, #5a3010); }
+    .gt-4 { background: linear-gradient(145deg, #C8F0D8, #A8E8C0); }
+    .gt-5 { background: linear-gradient(145deg, #3a0a0a, #600a0a); }
+    .gt-6 { background: linear-gradient(145deg, #1a0a3a, #3010a0); }
+    .gt-7 { background: linear-gradient(145deg, #C8E8F0, #A8D8E8); }
+    .gt-8 { background: linear-gradient(145deg, #2a0a2a, #500a50); }
+
+    /* =============================================
+       CHARACTER TRANSFORM
+    ============================================= */
+    #character {
+      overflow: hidden;
+    }
+
+    .character-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .character-info { }
+
+    .emotions-grid {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .emotion-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius-full);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .emotion-chip:hover, .emotion-chip.active {
+      background: var(--grad-subtle);
+      border-color: rgba(124,58,237,0.4);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    /* Before/After Slider */
+    .slider-wrap {
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      height: 440px;
+      cursor: col-resize;
+      user-select: none;
+      box-shadow: var(--shadow-card);
+    }
+
+    .slider-before, .slider-after {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .slider-before {
+      background: linear-gradient(145deg, #1a1a2e, #2a2a3e);
+      z-index: 1;
+    }
+
+    .slider-after {
+      background: linear-gradient(145deg, #1a0a2e, #3d1080);
+      z-index: 2;
+      clip-path: inset(0 50% 0 0);
+      transition: clip-path 0.1s linear;
+    }
+
+    .slider-label {
+      position: absolute;
+      bottom: 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+    }
+    .label-before { left: 16px; color: var(--text-muted); }
+    .label-after  { right: 16px; color: var(--text-accent); z-index: 3; }
+
+    .avatar-real {
+      font-size: 72px;
+      filter: grayscale(30%);
+    }
+    .avatar-cartoon {
+      font-size: 72px;
+    }
+
+    .slider-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: var(--grad-main);
+      z-index: 4;
+      transform: translateX(-50%);
+      cursor: col-resize;
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--grad-main);
+      box-shadow: 0 0 20px rgba(124,58,237,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #fff;
+      cursor: col-resize;
+      z-index: 5;
+    }
+
+    .avatar-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* =============================================
+       PRICING
+    ============================================= */
+    #pricing {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 36px 32px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .pricing-card.pro {
+      background: linear-gradient(145deg, #130a2a, #1a0a35);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+    }
+    .pricing-card.pro::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: calc(var(--radius-xl) + 2px);
+      background: var(--grad-main);
+      z-index: -1;
+    }
+    .pricing-card.pro:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(124,58,237,0.3);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--grad-main);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+
+    .plan-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+
+    .plan-price {
+      margin-bottom: 8px;
+    }
+    .plan-price .amount {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+    .plan-price .unit {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .plan-price .period {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .plan-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plan-features {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .plan-feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .plan-feature .check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .check-on  { background: var(--grad-main); color: #fff; }
+    .check-off { background: rgba(56,152,236,0.07); color: var(--text-muted); }
+
+    .btn-plan {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .btn-plan-free {
+      background: rgba(56,152,236,0.07);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-plan-free:hover {
+      background: rgba(56,152,236,0.12);
+      color: var(--text-primary);
+    }
+    .btn-plan-pro {
+      background: var(--grad-main);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    }
+    .btn-plan-pro:hover {
+      box-shadow: 0 8px 32px rgba(124,58,237,0.6);
+      transform: translateY(-2px);
+    }
+    .btn-plan-family {
+      background: rgba(56,152,236,0.07);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-plan-family:hover {
+      background: rgba(56,152,236,0.12);
+      color: var(--text-primary);
+    }
+
+    /* =============================================
+       CTA SECTION
+    ============================================= */
+    #cta {
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .cta-inner {
+      background: linear-gradient(135deg, rgba(56,168,245,0.10), rgba(124,58,237,0.08));
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: var(--radius-xl);
+      padding: 80px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-inner::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+      top: -100px;
+      left: -100px;
+    }
+    .cta-inner::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%);
+      bottom: -50px;
+      right: -50px;
+    }
+
+    .cta-title {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-form {
+      display: flex;
+      gap: 12px;
+      max-width: 480px;
+      margin: 0 auto 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-input {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: var(--radius-full);
+      background: rgba(56,152,236,0.07);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: var(--font-kr);
+      outline: none;
+      transition: var(--transition);
+    }
+    .cta-input::placeholder { color: var(--text-muted); }
+    .cta-input:focus {
+      border-color: rgba(124,58,237,0.5);
+      background: rgba(56,152,236,0.09);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+    }
+
+    .social-proof {
+      font-size: 14px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .user-avatars {
+      display: flex;
+    }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-left: -8px;
+    }
+    .user-avatar:first-child { margin-left: 0; }
+    .ua-1 { background: linear-gradient(135deg, #7C3AED, #EC4899); }
+    .ua-2 { background: linear-gradient(135deg, #3B82F6, #06B6D4); }
+    .ua-3 { background: linear-gradient(135deg, #10B981, #34D399); }
+    .ua-4 { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .footer-brand { max-width: 260px; }
+
+    .footer-logo {
+      font-size: 20px;
+      font-weight: 800;
+      background: var(--grad-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .footer-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .footer-links a:hover { color: var(--text-secondary); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    /* =============================================
+       MOBILE MENU
+    ============================================= */
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,15,0.98);
+      backdrop-filter: blur(20px);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+    .mobile-menu.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .mobile-menu a {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .mobile-menu a:hover { color: var(--text-primary); }
+    .mobile-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: none;
+      font-size: 28px;
+      color: var(--text-secondary);
+    }
+
+    /* =============================================
+       RESPONSIVE
+    ============================================= */
+    @media (max-width: 1024px) {
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      :root { --section-py: 72px; }
+
+      .nav-links { display: none; }
+      .nav .btn-primary { display: none; }
+      .hamburger { display: flex; }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 48px;
+        padding: 48px 0;
+      }
+      .hero-ctas { justify-content: center; }
+      .hero-stats { justify-content: center; }
+      .hero-mockup { height: 320px; }
+      .comic-panel-main { width: 200px; height: 240px; }
+      .comic-panel-sm1, .comic-panel-sm2, .comic-panel-sm3 { display: none; }
+
+      .steps-grid { grid-template-columns: 1fr; }
+      .style-panel.active { grid-template-columns: 1fr; }
+      .style-preview { height: 300px; }
+
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .character-inner { grid-template-columns: 1fr; gap: 40px; }
+      .slider-wrap { height: 320px; }
+
+      .pricing-grid { grid-template-columns: 1fr; max-width: 380px; }
+
+      .cta-form { flex-direction: column; }
+      .cta-inner { padding: 48px 24px; }
+
+      .footer-inner { flex-direction: column; gap: 24px; }
+      .footer-links { gap: 16px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .gallery-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 36px; }
+      .style-tabs { flex-direction: column; width: 90%; }
+      .emotions-grid { gap: 8px; }
+    }
+
+    /* =============================================
+       GRADIENT ACCENT DIVIDERS
+    ============================================= */
+    .grad-divider {
+      width: 80px;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--grad-main);
+      margin: 0 auto 32px;
+    }
+
+    .grad-divider-left {
+      margin-left: 0;
+    }
+
+    /* =============================================
+       FLOATING GRADIENT ORB DECORATIONS
+    ============================================= */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
+      opacity: 0.12;
+    }
+    .orb-purple { background: #7C3AED; }
+    .orb-pink   { background: #EC4899; }
+
+    /* =============================================
+       NOISE TEXTURE OVERLAY
+    ============================================= */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* =============================================
+       SCROLL INDICATOR
+    ============================================= */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      animation: scrollBounce 2s ease-in-out infinite;
+    }
+    .scroll-arrow {
+      width: 20px;
+      height: 20px;
+      border-right: 2px solid var(--text-muted);
+      border-bottom: 2px solid var(--text-muted);
+      transform: rotate(45deg);
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.5; }
+      50% { transform: translateX(-50%) translateY(8px); opacity: 1; }
+    }
+
+    /* =============================================
+       ANIMATED GRADIENT BACKGROUND
+    ============================================= */
+    .animated-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(236,72,153,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(59,130,246,0.04) 0%, transparent 50%);
+      animation: bgShift 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgShift {
+      0%   { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* =============================================
+       MISC UTILITIES
+    ============================================= */
+    .text-gradient {
+      background: var(--grad-main);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    .highlight-box {
+      display: inline-block;
+      background: var(--grad-subtle);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: var(--radius-sm);
+      padding: 2px 8px;
+      font-size: 13px;
+      color: var(--text-accent);
+      font-weight: 500;
+    }
+
+    /* character slider active emotion */
+    .character-showcase {
+      text-align: center;
+    }
+    .character-showcase .big-emoji {
+      font-size: 80px;
+      margin-bottom: 8px;
+      display: block;
+      transition: var(--transition);
+    }
+    .character-showcase .emotion-label {
+      font-size: 14px;
+      color: var(--text-accent);
+      font-weight: 600;
+    }
+
+    /* Animations for character showcase */
+    @keyframes emojiPop {
+      0%   { transform: scale(0.8); opacity: 0; }
+      60%  { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .emoji-pop {
+      animation: emojiPop 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================================
+     BACKGROUND EFFECTS
+============================================= -->
+<div class="particles" id="particles" aria-hidden="true"></div>
+<div class="stars" id="stars" aria-hidden="true"></div>
+
+<!-- =============================================
+     MOBILE MENU
+============================================= -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="모바일 메뉴">
+  <button class="mobile-close" id="mobileClose" aria-label="메뉴 닫기">✕</button>
+  <a href="#how" onclick="closeMobileMenu()">서비스소개</a>
+  <a href="#gallery" onclick="closeMobileMenu()">갤러리</a>
+  <a href="#pricing" onclick="closeMobileMenu()">요금제</a>
+  <a href="#cta" class="btn btn-primary" onclick="closeMobileMenu()">무료로 시작하기</a>
+</div>
+
+<!-- =============================================
+     HEADER
+============================================= -->
+<header class="header" id="header">
+  <nav class="nav" role="navigation" aria-label="주 메뉴">
+    <a href="#" class="nav-logo" aria-label="iStoryToon 홈">
+      <span class="emoji" aria-hidden="true">🌸</span>iStoryToon
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a href="#how">서비스소개</a></li>
+      <li><a href="#gallery">갤러리</a></li>
+      <li><a href="#pricing">요금제</a></li>
+      <li><a href="#cta">시작하기</a></li>
+    </ul>
+
+    <a href="#cta" class="btn btn-primary" aria-label="무료로 시작하기">
+      무료로 시작하기
+    </a>
+
+    <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- =============================================
+     HERO SECTION
+============================================= -->
+<section id="hero" class="section">
+  <div class="animated-bg" aria-hidden="true"></div>
+  <div class="hero-bg-glow hero-glow-1" aria-hidden="true"></div>
+  <div class="hero-bg-glow hero-glow-2" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="hero-inner">
+      <!-- Left: Copy -->
+      <div class="hero-copy">
+        <div class="hero-badge fade-up" aria-label="새로운 AI 서비스 오픈">
+          ✨ AI 만화 제작 서비스 오픈
+        </div>
+
+        <h1 class="hero-title fade-up delay-1">
+          나의 이야기를,<br/>
+          <span class="gradient-text">나만의 만화로</span>
+        </h1>
+
+        <p class="hero-sub fade-up delay-2">
+          사진 한 장과 이야기 한 줄이면 충분해요.<br/>
+          AI가 당신의 일상을 특별한 만화로 만들어드려요.
+        </p>
+
+        <div class="hero-ctas fade-up delay-3">
+          <a href="#cta" class="btn btn-primary btn-lg">
+            지금 만들어보기 →
+          </a>
+          <a href="#gallery" class="btn btn-secondary btn-lg">
+            갤러리 보기
+          </a>
+        </div>
+
+        <div class="hero-stats fade-up delay-4">
+          <div class="stat-item">
+            <div class="stat-num">1,200+</div>
+            <div class="stat-label">만들어진 만화</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">3가지</div>
+            <div class="stat-label">아트 스타일</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">5분</div>
+            <div class="stat-label">평균 제작 시간</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Comic Mockup -->
+      <div class="hero-mockup fade-up delay-2" aria-hidden="true">
+        <!-- Main panel -->
+        <div class="comic-frame comic-panel-main">
+          <div class="comic-dots">
+            <span class="dot-r"></span>
+            <span class="dot-y"></span>
+            <span class="dot-g"></span>
+          </div>
+          <div class="panel-emoji">🌸</div>
+          <div class="panel-caption">봄날의 우리 이야기</div>
+          <div class="panel-lines">
+            <div class="panel-line"></div>
+            <div class="panel-line"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;width:100%;margin-top:8px;">
+            <div style="aspect-ratio:1;background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(236,72,153,0.3));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">😊</div>
+            <div style="aspect-ratio:1;background:linear-gradient(135deg,rgba(236,72,153,0.3),rgba(124,58,237,0.2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">🌸</div>
+            <div style="aspect-ratio:1;background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(124,58,237,0.3));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">💬</div>
+            <div style="aspect-ratio:1;background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(59,130,246,0.2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">⭐</div>
+          </div>
+          <div class="panel-label" style="margin-top:8px;">4컷 만화 • 순정만화 스타일</div>
+        </div>
+
+        <!-- Small panels -->
+        <div class="comic-frame comic-panel-sm1">
+          <div class="panel-emoji-sm">🎨</div>
+          <div class="panel-label">스타일 선택</div>
+        </div>
+        <div class="comic-frame comic-panel-sm2">
+          <div class="panel-emoji-sm">📸</div>
+          <div class="panel-label">캐릭터 변환</div>
+        </div>
+        <div class="comic-frame comic-panel-sm3">
+          <div class="panel-emoji-sm">✨</div>
+          <div class="panel-label">AI 완성</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="scroll-indicator" aria-hidden="true">
+    <span>SCROLL</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- =============================================
+     HOW IT WORKS
+============================================= -->
+<section id="how" class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label fade-up">HOW IT WORKS</div>
+      <h2 class="section-title fade-up delay-1">
+        3단계로 완성되는<br/><span class="text-gradient">나만의 만화</span>
+      </h2>
+      <div class="grad-divider"></div>
+      <p class="section-desc fade-up delay-2">
+        복잡한 설정 없이 누구나 쉽게.<br/>
+        이야기를 쓰고, 사진을 올리면 AI가 알아서 완성해드려요.
+      </p>
+    </div>
+
+    <div class="steps-grid">
+      <!-- Step 01 -->
+      <div class="step-card fade-up delay-1">
+        <div class="step-num">STEP 01</div>
+        <div class="step-icon-wrap" aria-hidden="true">📝</div>
+        <h3 class="step-title">이야기 입력</h3>
+        <p class="step-desc">소중한 순간을 글로 써주세요. 짧은 메모도, 긴 이야기도 모두 괜찮아요.</p>
+
+        <!-- Step 01 Mockup -->
+        <div class="step-mockup" aria-hidden="true">
+          <div class="mockup-toolbar">
+            <div class="mockup-dot" style="background:#ff5f57"></div>
+            <div class="mockup-dot" style="background:#febc2e"></div>
+            <div class="mockup-dot" style="background:#28c840"></div>
+            <span style="font-size:11px;color:var(--text-muted);margin-left:auto;">iStoryToon</span>
+          </div>
+          <div class="mockup-textarea">
+            오늘 친구와 벚꽃 구경을 갔어요. 꽃잎이 하늘하늘 날리는 모습이 너무 예뻤어요<span class="cursor"></span>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="highlight-box">🌸 봄</span>
+            <span class="highlight-box">👫 친구</span>
+            <span class="highlight-box">🌷 꽃구경</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 02 -->
+      <div class="step-card fade-up delay-2">
+        <div class="step-num">STEP 02</div>
+        <div class="step-icon-wrap" aria-hidden="true">📸</div>
+        <h3 class="step-title">사진 업로드</h3>
+        <p class="step-desc">나의 사진을 카툰 캐릭터로 변환해드려요. 다양한 감정 표현도 자동으로 생성돼요.</p>
+
+        <!-- Step 02 Mockup -->
+        <div class="step-mockup" aria-hidden="true">
+          <div class="mockup-toolbar">
+            <div class="mockup-dot" style="background:#ff5f57"></div>
+            <div class="mockup-dot" style="background:#febc2e"></div>
+            <div class="mockup-dot" style="background:#28c840"></div>
+          </div>
+          <div class="mockup-upload-zone">
+            <div class="upload-icon">📁</div>
+            <div>사진을 드래그하거나 클릭하세요</div>
+            <div style="margin-top:8px;display:flex;justify-content:center;gap:8px;font-size:18px;">
+              🧑 →  🎨
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <div class="mockup-progress">
+              <div class="progress-label">
+                <span>캐릭터 변환 중...</span>
+                <span style="color:var(--text-accent)">78%</span>
+              </div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 03 -->
+      <div class="step-card fade-up delay-3">
+        <div class="step-num">STEP 03</div>
+        <div class="step-icon-wrap" aria-hidden="true">🎨</div>
+        <h3 class="step-title">만화 완성</h3>
+        <p class="step-desc">AI가 나만의 만화를 완성해드려요. 완성된 만화는 바로 다운로드하거나 공유할 수 있어요.</p>
+
+        <!-- Step 03 Mockup -->
+        <div class="step-mockup" aria-hidden="true">
+          <div class="mockup-toolbar">
+            <div class="mockup-dot" style="background:#ff5f57"></div>
+            <div class="mockup-dot" style="background:#febc2e"></div>
+            <div class="mockup-dot" style="background:#28c840"></div>
+          </div>
+          <div class="mockup-panels">
+            <div class="mini-panel mini-panel-1">🌸</div>
+            <div class="mini-panel mini-panel-2">😊</div>
+            <div class="mini-panel mini-panel-3">💬</div>
+            <div class="mini-panel mini-panel-4">⭐</div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:6px;">
+            <button style="flex:1;padding:8px;background:var(--grad-main);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;">다운로드</button>
+            <button style="flex:1;padding:8px;background:rgba(56,152,236,0.08);border:1px solid var(--border);border-radius:8px;color:var(--text-secondary);font-size:12px;font-weight:600;cursor:pointer;">공유하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     STYLE SELECTOR
+============================================= -->
+<section id="styles" class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label fade-up">ART STYLE</div>
+      <h2 class="section-title fade-up delay-1">
+        나의 취향대로<br/><span class="text-gradient">스타일 선택</span>
+      </h2>
+      <div class="grad-divider"></div>
+      <p class="section-desc fade-up delay-2">
+        순정만화부터 웹툰, 디즈니까지.<br/>
+        원하는 스타일로 나만의 만화를 완성해보세요.
+      </p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="style-tabs fade-up" role="tablist" aria-label="만화 스타일 선택">
+      <button class="style-tab active" role="tab" aria-selected="true" aria-controls="panel-romance" onclick="switchStyle('romance', this)">
+        💜 순정만화
+      </button>
+      <button class="style-tab" role="tab" aria-selected="false" aria-controls="panel-webtoon" onclick="switchStyle('webtoon', this)">
+        🟦 웹툰
+      </button>
+      <button class="style-tab" role="tab" aria-selected="false" aria-controls="panel-disney" onclick="switchStyle('disney', this)">
+        🏰 디즈니
+      </button>
+    </div>
+
+    <!-- Style Panels -->
+    <div class="style-panels">
+
+      <!-- Romance -->
+      <div class="style-panel romance active" id="panel-romance" role="tabpanel">
+        <div class="style-info">
+          <div class="style-badge badge-romance">💜 순정만화 스타일</div>
+          <h3 class="style-title">감성 충만한<br/>순정만화</h3>
+          <p class="style-desc">繊細한 선화와 파스텔 톤으로 감성적인 순간을 담아내요. 로맨틱하고 아름다운 장면 연출에 최적화되어 있어요.</p>
+          <div class="style-features">
+            <div class="style-feature">부드러운 선화 & 파스텔 컬러</div>
+            <div class="style-feature">꽃잎·반짝임 배경 효과</div>
+            <div class="style-feature">로맨틱 말풍선 디자인</div>
+            <div class="style-feature">감정 표현 풍부한 눈 표현</div>
+          </div>
+        </div>
+        <div class="style-preview romance" aria-hidden="true">
+          <div class="style-preview-cell">🌸<div class="cell-caption">메인 장면</div></div>
+          <div class="style-preview-cell">💕<div class="cell-caption">감정 표현</div></div>
+          <div class="style-preview-cell">✨<div class="cell-caption">배경 효과</div></div>
+        </div>
+      </div>
+
+      <!-- Webtoon -->
+      <div class="style-panel webtoon" id="panel-webtoon" role="tabpanel">
+        <div class="style-info">
+          <div class="style-badge badge-webtoon">🟦 웹툰 스타일</div>
+          <h3 class="style-title">역동적인<br/>웹툰 스타일</h3>
+          <p class="style-desc">선명한 색감과 역동적인 구도로 생생한 이야기를 전달해요. 일상의 모든 순간을 웹툰처럼 표현할 수 있어요.</p>
+          <div class="style-features">
+            <div class="style-feature">선명한 채색 & 강한 대비</div>
+            <div class="style-feature">역동적인 카메라 앵글</div>
+            <div class="style-feature">효과음 & 액션 라인</div>
+            <div class="style-feature">세로 스크롤 최적화 컷</div>
+          </div>
+        </div>
+        <div class="style-preview webtoon" aria-hidden="true">
+          <div class="style-preview-cell">⚡<div class="cell-caption">액션 장면</div></div>
+          <div class="style-preview-cell">💬<div class="cell-caption">대화 장면</div></div>
+          <div class="style-preview-cell">🌆<div class="cell-caption">배경 묘사</div></div>
+        </div>
+      </div>
+
+      <!-- Disney -->
+      <div class="style-panel disney" id="panel-disney" role="tabpanel">
+        <div class="style-info">
+          <div class="style-badge badge-disney">🏰 디즈니 스타일</div>
+          <h3 class="style-title">꿈같은<br/>디즈니 스타일</h3>
+          <p class="style-desc">따뜻하고 생동감 넘치는 디즈니 감성으로 동화 같은 이야기를 표현해요. 어린이부터 어른까지 모두가 좋아하는 스타일이에요.</p>
+          <div class="style-features">
+            <div class="style-feature">따뜻한 컬러 팔레트</div>
+            <div class="style-feature">풍부한 표정 & 몸짓</div>
+            <div class="style-feature">동화적인 배경 묘사</div>
+            <div class="style-feature">마법 & 반짝임 효과</div>
+          </div>
+        </div>
+        <div class="style-preview disney" aria-hidden="true">
+          <div class="style-preview-cell">🏰<div class="cell-caption">배경 장면</div></div>
+          <div class="style-preview-cell">🌟<div class="cell-caption">마법 효과</div></div>
+          <div class="style-preview-cell">🦋<div class="cell-caption">자연 묘사</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     GALLERY
+============================================= -->
+<section id="gallery" class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label fade-up">GALLERY</div>
+      <h2 class="section-title fade-up delay-1">
+        이미 만들어진<br/><span class="text-gradient">이야기들</span>
+      </h2>
+      <div class="grad-divider"></div>
+      <p class="section-desc fade-up delay-2">
+        다양한 이야기를 만화로 표현한 작품들을 구경해보세요.
+      </p>
+    </div>
+
+    <div class="gallery-grid">
+      <!-- Card 1 -->
+      <div class="gallery-card fade-up delay-1">
+        <div class="gallery-thumb gt-1">🌸</div>
+        <div class="gallery-info">
+          <div class="gallery-title">봄날의 우리</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-romance-sm">순정만화</span>
+            <span class="gallery-cuts">6컷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="gallery-card fade-up delay-2">
+        <div class="gallery-thumb gt-2">🏙️</div>
+        <div class="gallery-info">
+          <div class="gallery-title">도시 탐험</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-webtoon-sm">웹툰</span>
+            <span class="gallery-cuts">8컷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="gallery-card fade-up delay-3">
+        <div class="gallery-thumb gt-3">🏰</div>
+        <div class="gallery-info">
+          <div class="gallery-title">마법의 모험</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-disney-sm">디즈니</span>
+            <span class="gallery-cuts">10컷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="gallery-card fade-up delay-4">
+        <div class="gallery-thumb gt-4">🌿</div>
+        <div class="gallery-info">
+          <div class="gallery-title">숲속 산책</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-romance-sm2">순정만화</span>
+            <span class="gallery-cuts">4컷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="gallery-card fade-up delay-1">
+        <div class="gallery-thumb gt-5">🌅</div>
+        <div class="gallery-info">
+          <div class="gallery-title">노을 아래서</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-romance-sm">순정만화</span>
+            <span class="gallery-cuts">6컷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="gallery-card fade-up delay-2">
+        <div class="gallery-thumb gt-6">⚡</div>
+        <div class="gallery-info">
+          <div class="gallery-title">첫 대회</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-webtoon-sm">웹툰</span>
+            <span class="gallery-cuts">12컷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="gallery-card fade-up delay-3">
+        <div class="gallery-thumb gt-7">🌊</div>
+        <div class="gallery-info">
+          <div class="gallery-title">바다 여행</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-disney-sm">디즈니</span>
+            <span class="gallery-cuts">8컷</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="gallery-card fade-up delay-4">
+        <div class="gallery-thumb gt-8">🎵</div>
+        <div class="gallery-info">
+          <div class="gallery-title">음악이 흐르는 날</div>
+          <div class="gallery-meta">
+            <span class="gallery-badge badge-romance-sm2">순정만화</span>
+            <span class="gallery-cuts">6컷</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CHARACTER TRANSFORM
+============================================= -->
+<section id="character" class="section">
+  <div class="orb orb-purple" style="width:400px;height:400px;top:-100px;right:-100px;"></div>
+  <div class="container">
+    <div class="character-inner">
+      <!-- Left: Info -->
+      <div class="character-info">
+        <div class="section-label fade-up">CHARACTER</div>
+        <h2 class="section-title fade-up delay-1">
+          나만의 캐릭터로<br/><span class="text-gradient">만들어요</span>
+        </h2>
+        <div class="grad-divider grad-divider-left" style="margin-bottom:20px;"></div>
+        <p class="section-desc fade-up delay-2">
+          실제 사진을 업로드하면 AI가 당신만의 카툰 캐릭터를 만들어드려요.<br/>
+          같은 캐릭터로 다양한 감정과 상황을 표현할 수 있어요.
+        </p>
+
+        <p class="fade-up delay-3" style="font-size:15px;font-weight:600;color:var(--text-accent);margin-top:28px;margin-bottom:16px;">
+          같은 캐릭터, 다양한 감정 표현
+        </p>
+
+        <div class="emotions-grid fade-up delay-4" id="emotionsGrid">
+          <div class="emotion-chip active" onclick="setEmotion(this, '😊', '기쁨')">
+            <span>😊</span> 기쁨
+          </div>
+          <div class="emotion-chip" onclick="setEmotion(this, '😢', '슬픔')">
+            <span>😢</span> 슬픔
+          </div>
+          <div class="emotion-chip" onclick="setEmotion(this, '😍', '설렘')">
+            <span>😍</span> 설렘
+          </div>
+          <div class="emotion-chip" onclick="setEmotion(this, '😤', '화남')">
+            <span>😤</span> 화남
+          </div>
+          <div class="emotion-chip" onclick="setEmotion(this, '😮', '놀람')">
+            <span>😮</span> 놀람
+          </div>
+        </div>
+
+        <div class="fade-up" style="margin-top:32px;">
+          <a href="#cta" class="btn btn-primary btn-lg">
+            내 캐릭터 만들기 →
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Before/After Slider -->
+      <div class="fade-up delay-2">
+        <div class="slider-wrap" id="sliderWrap" aria-label="실제 사진과 카툰 변환 비교 슬라이더">
+          <!-- Before: Real photo -->
+          <div class="slider-before">
+            <div class="avatar-real" aria-hidden="true">🧑</div>
+            <div class="avatar-name">실제 사진</div>
+            <span class="slider-label label-before">BEFORE</span>
+          </div>
+
+          <!-- After: Cartoon -->
+          <div class="slider-after" id="sliderAfter">
+            <div class="character-showcase">
+              <span class="big-emoji" id="charEmoji" aria-live="polite">😊</span>
+              <div class="avatar-name" style="color:var(--text-accent);">카툰 캐릭터</div>
+              <div class="emotion-label" id="charEmotionLabel">기쁨 표현</div>
+            </div>
+            <span class="slider-label label-after" style="z-index:3;">AFTER</span>
+          </div>
+
+          <!-- Divider + Handle -->
+          <div class="slider-divider" id="sliderDivider" aria-hidden="true">
+            <div class="slider-handle">⟺</div>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:12px;">
+          ← 슬라이더를 드래그해서 비교해보세요 →
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     PRICING
+============================================= -->
+<section id="pricing" class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label fade-up">PRICING</div>
+      <h2 class="section-title fade-up delay-1">
+        합리적인<br/><span class="text-gradient">요금제</span>
+      </h2>
+      <div class="grad-divider"></div>
+      <p class="section-desc fade-up delay-2">
+        무료로 시작하고, 필요할 때 업그레이드하세요.<br/>
+        언제든지 해지할 수 있어요.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- FREE -->
+      <div class="pricing-card fade-up delay-1">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">
+          <span class="amount">0</span>
+          <span class="unit">원</span>
+          <div class="period">/월 · 영원히 무료</div>
+        </div>
+        <p class="plan-tagline">가볍게 시작해보세요</p>
+        <div class="plan-features">
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            월 3편 제작
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            기본 스타일 3종
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            4~6컷 만화
+          </div>
+          <div class="plan-feature">
+            <span class="check check-off">✗</span>
+            <span style="color:var(--text-muted);">캐릭터 변환</span>
+          </div>
+          <div class="plan-feature">
+            <span class="check check-off">✗</span>
+            <span style="color:var(--text-muted);">고화질 다운로드</span>
+          </div>
+        </div>
+        <button class="btn btn-plan btn-plan-free">무료로 시작하기</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="pricing-card pro fade-up delay-2">
+        <div class="pricing-badge">⭐ 추천</div>
+        <div class="plan-name">PRO</div>
+        <div class="plan-price">
+          <span class="amount" style="background:var(--grad-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">9,900</span>
+          <span class="unit">원</span>
+          <div class="period">/월 · 연간 결제 시 20% 할인</div>
+        </div>
+        <p class="plan-tagline">무제한으로 마음껏 만들어요</p>
+        <div class="plan-features">
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            무제한 제작
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            전체 스타일 (추가 업데이트 포함)
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            8~12컷 만화
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            AI 캐릭터 변환
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            고화질 다운로드
+          </div>
+        </div>
+        <button class="btn btn-plan btn-plan-pro">PRO 시작하기 →</button>
+      </div>
+
+      <!-- FAMILY -->
+      <div class="pricing-card fade-up delay-3">
+        <div class="plan-name">Family</div>
+        <div class="plan-price">
+          <span class="amount">19,900</span>
+          <span class="unit">원</span>
+          <div class="period">/월 · 최대 5인 공유</div>
+        </div>
+        <p class="plan-tagline">가족과 함께 이야기를 만들어요</p>
+        <div class="plan-features">
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            5인 계정 공유
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            모든 PRO 기능 포함
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            가족 갤러리 공유
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            4K 고화질 다운로드
+          </div>
+          <div class="plan-feature">
+            <span class="check check-on">✓</span>
+            전용 고객 지원
+          </div>
+        </div>
+        <button class="btn btn-plan btn-plan-family">Family 시작하기</button>
+      </div>
+    </div>
+
+    <!-- Pricing note -->
+    <p class="fade-up" style="text-align:center;font-size:14px;color:var(--text-muted);margin-top:32px;">
+      💳 신용카드, 카카오페이, 네이버페이 결제 가능 · 언제든지 해지 가능
+    </p>
+  </div>
+</section>
+
+<!-- =============================================
+     CTA SECTION
+============================================= -->
+<section id="cta" class="section">
+  <div class="container">
+    <div class="cta-inner fade-up">
+      <div class="section-label" style="justify-content:center;">START NOW</div>
+      <h2 class="cta-title">
+        지금 바로 첫 만화를<br/>
+        <span class="text-gradient">만들어보세요</span>
+      </h2>
+      <p class="cta-desc">
+        이메일만 입력하면 무료로 시작할 수 있어요.<br/>
+        신용카드 없이, 언제든지 취소 가능해요.
+      </p>
+
+      <form class="cta-form" onsubmit="handleCTASubmit(event)" aria-label="회원가입 폼">
+        <label for="ctaEmail" class="visually-hidden">이메일 주소</label>
+        <input
+          type="email"
+          id="ctaEmail"
+          class="cta-input"
+          placeholder="이메일 주소를 입력해주세요"
+          required
+          autocomplete="email"
+        />
+        <button type="submit" class="btn btn-primary" style="white-space:nowrap;padding:14px 28px;">
+          무료 시작 →
+        </button>
+      </form>
+
+      <div class="social-proof fade-up delay-1">
+        <div class="user-avatars" aria-hidden="true">
+          <div class="user-avatar ua-1">👩</div>
+          <div class="user-avatar ua-2">👨</div>
+          <div class="user-avatar ua-3">👧</div>
+          <div class="user-avatar ua-4">🧑</div>
+        </div>
+        <span>이미 <strong>1,200명</strong>이 만화를 만들었어요 🌸</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     FOOTER
+============================================= -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">🌸 iStoryToon</div>
+        <p class="footer-tagline">
+          AI가 나의 이야기를 만화로 만들어주는 서비스.<br/>
+          사진 한 장과 이야기 한 줄로 시작하세요.
+        </p>
+      </div>
+      <div class="footer-links" role="navigation" aria-label="푸터 링크">
+        <a href="#">개인정보처리방침</a>
+        <a href="#">이용약관</a>
+        <a href="mailto:hello@istorytoon.ai">문의하기</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 iStoryToon. All rights reserved.</span>
+      <span style="display:flex;align-items:center;gap:6px;">
+        Made with ❤️ &amp; ✨ AI
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- =============================================
+     JAVASCRIPT
+============================================= -->
+<script>
+  /* =============================================
+     PARTICLE SYSTEM
+  ============================================= */
+  (function initParticles() {
+    const container = document.getElementById('particles');
+    const count = 12;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 2;
+      p.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        left: ${Math.random() * 100}%;
+        animation-duration: ${Math.random() * 15 + 10}s;
+        animation-delay: ${Math.random() * 10}s;
+        opacity: 0;
+      `;
+      container.appendChild(p);
+    }
+  })();
+
+  /* =============================================
+     STARS
+  ============================================= */
+  (function initStars() {
+    const container = document.getElementById('stars');
+    const count = 80;
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+        animation-duration: ${Math.random() * 3 + 2}s;
+        animation-delay: ${Math.random() * 3}s;
+        width: ${Math.random() > 0.8 ? 3 : 2}px;
+        height: ${Math.random() > 0.8 ? 3 : 2}px;
+        opacity: ${Math.random() * 0.5 + 0.1};
+      `;
+      container.appendChild(s);
+    }
+  })();
+
+  /* =============================================
+     HEADER SCROLL EFFECT
+  ============================================= */
+  const header = document.getElementById('header');
+  let lastScroll = 0;
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    if (scrollY > 20) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+    lastScroll = scrollY;
+  }, { passive: true });
+
+  /* =============================================
+     MOBILE MENU
+  ============================================= */
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const mobileClose = document.getElementById('mobileClose');
+
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  });
+
+  mobileClose.addEventListener('click', closeMobileMenu);
+
+  function closeMobileMenu() {
+    mobileMenu.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  // Close on outside click
+  mobileMenu.addEventListener('click', (e) => {
+    if (e.target === mobileMenu) closeMobileMenu();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+      closeMobileMenu();
+    }
+  });
+
+  /* =============================================
+     INTERSECTION OBSERVER (Scroll Animations)
+  ============================================= */
+  const fadeUpEls = document.querySelectorAll('.fade-up');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  fadeUpEls.forEach(el => observer.observe(el));
+
+  /* =============================================
+     STYLE TABS
+  ============================================= */
+  function switchStyle(style, btn) {
+    // Remove active from all tabs and panels
+    document.querySelectorAll('.style-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.style-panel').forEach(p => p.classList.remove('active'));
+
+    // Activate selected
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    document.getElementById('panel-' + style).classList.add('active');
+  }
+
+  /* =============================================
+     BEFORE/AFTER SLIDER
+  ============================================= */
+  (function initSlider() {
+    const wrap = document.getElementById('sliderWrap');
+    const after = document.getElementById('sliderAfter');
+    const divider = document.getElementById('sliderDivider');
+    let isDragging = false;
+
+    function setPosition(x) {
+      const rect = wrap.getBoundingClientRect();
+      let pct = ((x - rect.left) / rect.width) * 100;
+      pct = Math.max(5, Math.min(95, pct));
+      after.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+      divider.style.left = pct + '%';
+    }
+
+    wrap.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      setPosition(e.clientX);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) setPosition(e.clientX);
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    wrap.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      setPosition(e.touches[0].clientX);
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (isDragging) setPosition(e.touches[0].clientX);
+    }, { passive: true });
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    // Animate initial reveal
+    let pct = 50;
+    const intro = setInterval(() => {
+      pct -= 0.5;
+      if (pct <= 40) { clearInterval(intro); return; }
+      after.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+      divider.style.left = pct + '%';
+    }, 30);
+  })();
+
+  /* =============================================
+     EMOTION CHIPS
+  ============================================= */
+  function setEmotion(el, emoji, label) {
+    // Remove active from all chips
+    document.querySelectorAll('.emotion-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+
+    const emojiEl = document.getElementById('charEmoji');
+    const labelEl = document.getElementById('charEmotionLabel');
+
+    emojiEl.classList.remove('emoji-pop');
+    // Trigger reflow
+    void emojiEl.offsetWidth;
+    emojiEl.classList.add('emoji-pop');
+
+    emojiEl.textContent = emoji;
+    labelEl.textContent = label + ' 표현';
+  }
+
+  /* =============================================
+     CTA FORM
+  ============================================= */
+  function handleCTASubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById('ctaEmail');
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.textContent;
+
+    btn.textContent = '✓ 완료!';
+    btn.style.background = 'linear-gradient(135deg, #10B981, #34D399)';
+    input.value = '';
+
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.background = '';
+    }, 3000);
+  }
+
+  /* =============================================
+     SMOOTH SCROLL for Nav Links
+  ============================================= */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href === '#') return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      const offset = 72; // header height
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+
+  /* =============================================
+     PRICING CARD HOVER GLOW
+  ============================================= */
+  document.querySelectorAll('.pricing-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--glow-x', x + '%');
+      card.style.setProperty('--glow-y', y + '%');
+    });
+  });
+
+  /* =============================================
+     GALLERY CARD: prevent scroll during hover
+  ============================================= */
+  document.querySelectorAll('.gallery-card').forEach(card => {
+    card.addEventListener('click', () => {
+      card.style.transform = 'scale(1.02) translateY(-6px)';
+      setTimeout(() => { card.style.transform = ''; }, 300);
+    });
+  });
+</script>
+</body>
+</html>
