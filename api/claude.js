@@ -60,7 +60,8 @@ function buildUserPrompt(story, cuts, style, characters = {}) {
       "imagePrompt": {
         "shoujo": "shoujo anime manga style prompt in English",
         "webtoon": "Korean webtoon style prompt in English",
-        "disney": "Disney Pixar animation style prompt in English"
+        "disney": "Disney Pixar animation style prompt in English",
+        "watercolor": "soft watercolor painting style prompt in English"
       }
     }
   ],
