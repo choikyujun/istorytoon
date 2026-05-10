@@ -9,9 +9,10 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config.js';
 const IMAGE_EDGE_URL = `${SUPABASE_URL}/functions/v1/image-generate`;
 
 const STYLE_SUFFIX = {
-  shoujo:  'shoujo anime manga style, soft pastel colors, sparkle effects, clean linework, no text, no watermark',
-  webtoon: 'Korean webtoon style, bold clean lines, vibrant colors, expressive characters, no text, no watermark',
-  disney:  'Disney Pixar 3D animation style, cinematic warm lighting, vibrant colors, no text, no watermark',
+  shoujo:     'shoujo anime manga style, soft pastel colors, sparkle effects, clean linework, no text, no watermark',
+  webtoon:    'Korean webtoon style, bold clean lines, vibrant colors, expressive characters, no text, no watermark',
+  disney:     'Disney Pixar 3D animation style, cinematic warm lighting, vibrant colors, no text, no watermark',
+  watercolor: 'soft watercolor painting style, gentle brushstrokes, warm pastel tones, delicate ink outlines, dreamy atmosphere, no text, no watermark',
 };
 
 // ── 워밍업 ─────────────────────────────────────
