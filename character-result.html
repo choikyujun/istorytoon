@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iStoryToon - 캐릭터 감정 변환 비교</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F0F8FF; color: #0F1923; font-family: -apple-system, 'Pretendard', sans-serif; padding: 32px 16px; }
+  h1 { text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 6px;
+    background: linear-gradient(135deg, #38A8F5, #7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { text-align: center; color: #5A7A93; font-size: 13px; margin-bottom: 24px; line-height: 1.7; }
+
+  .tabs { display:flex; justify-content:center; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
+  .tab { padding:9px 20px; border-radius:20px; font-size:13px; font-weight:700; cursor:pointer;
+    background:white; border:1.5px solid rgba(56,152,236,0.25); color:#5A7A93; transition:all 0.2s; }
+  .tab.active { background:linear-gradient(135deg,#38A8F5,#7C3AED); color:white; border-color:transparent;
+    box-shadow:0 4px 14px rgba(56,152,236,0.30); }
+  .tab:hover:not(.active) { border-color:#38A8F5; color:#1A7FD4; }
+
+  .panel { display:none; }
+  .panel.active { display:block; }
+  .section-title { text-align:center; font-size:11px; font-weight:700; color:#7A9AB3;
+    margin-bottom:14px; text-transform:uppercase; letter-spacing:1.5px; }
+
+  .flow { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:28px; flex-wrap:wrap; }
+  .flow-step { text-align:center; }
+  .flow-img { width:100px; height:100px; border-radius:12px; object-fit:cover; object-position:top;
+    border:2px solid rgba(56,152,236,0.3); box-shadow:0 4px 12px rgba(56,152,236,0.1); }
+  .flow-label { font-size:11px; color:#5A7A93; margin-top:6px; font-weight:600; }
+  .flow-arrow { font-size:24px; color:#B8D8F8; }
+
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; max-width:1000px; margin:0 auto 24px; }
+  .card { background:white; border:1.5px solid rgba(56,152,236,0.18); border-radius:16px; overflow:hidden;
+    box-shadow:0 4px 16px rgba(56,152,236,0.08); transition:transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform:translateY(-5px); box-shadow:0 8px 28px rgba(56,152,236,0.18); }
+  .card img { width:100%; aspect-ratio:1; object-fit:cover; object-position:top; }
+  .card-info { padding:12px; }
+  .badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; margin-bottom:5px; }
+  .b-sad   { background:#EEF0FF; color:#5A6ED4; }
+  .b-love  { background:#FFF0F8; color:#D45A8A; }
+  .b-angry { background:#FFF0EB; color:#D4705A; }
+  .b-shock { background:#FFFBE8; color:#D4A040; }
+  .card-title { font-size:13px; font-weight:800; margin-bottom:2px; }
+  .model-tag { display:inline-block; margin-top:5px; padding:2px 8px; border-radius:8px;
+    font-size:10px; font-weight:600; background:#F0F4F8; color:#8A9AB3; }
+
+  .result-note { max-width:1000px; margin:0 auto 0; padding:18px 24px; background:white;
+    border-radius:16px; border:1.5px solid rgba(56,152,236,0.18); }
+  .result-note p { font-size:13px; color:#3D5A73; line-height:1.8; text-align:center; }
+  .result-note strong { color:#1A7FD4; }
+  .result-note .win { color:#16A34A; font-weight:800; }
+
+  @media(max-width:700px) { .grid { grid-template-columns:repeat(2,1fr); } .flow-arrow { display:none; } }
+  @media(max-width:400px) { .grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+  <h1>🌸 캐릭터 변환 모델 비교</h1>
+  <p class="sub">
+    <b>v1</b> InstantID — 얼굴 유지, 감정 약함<br>
+    <b>v2</b> PhotoMaker — 감정 강함, 얼굴 유사도 보통<br>
+    <b>v3</b> <span style="color:#7C3AED;font-weight:800;">InstantID → PhotoMaker 조합</span> — 얼굴 유지 + 감정 과장 ⭐
+  </p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('v1')">v1 · InstantID</div>
+    <div class="tab" onclick="switchTab('v2')">v2 · PhotoMaker</div>
+    <div class="tab" onclick="switchTab('v3')">✨ v3 · 조합 (추천)</div>
+  </div>
+
+  <!-- V1 -->
+  <div class="panel active" id="panel-v1">
+    <div class="section-title">InstantID — 얼굴 유사도 ⭐⭐⭐⭐⭐ / 감정 과장 ⭐⭐</div>
+    <div class="grid">
+      <div class="card"><img src="https://replicate.delivery/xezq/CURhQ3FL6h7NBZQmvgIoHToFkYs0bfA5wCy435MW8KOHcxRLA/out_0.webp" alt="슬픔">
+        <div class="card-info"><span class="badge b-sad">😢 슬픔</span><div class="card-title">슬픈 표정</div><div class="model-tag">InstantID</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/obUXTmAYKk4dBdXNcOzTwitWjiM3ZOxp7na70jCffnbl4ijWA/out_0.webp" alt="설렘">
+        <div class="card-info"><span class="badge b-love">😍 설렘</span><div class="card-title">설레는 표정</div><div class="model-tag">InstantID</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/3bZKeePxmmuj6UKOf72JNhymxgkduaCqm8g4XGDDxpLNyFHtA/out_0.webp" alt="화남">
+        <div class="card-info"><span class="badge b-angry">😤 화남</span><div class="card-title">화난 표정</div><div class="model-tag">InstantID</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/Gx4ySk2zKc7zKxc5b3YcftMXDuVccm6sLLF7VzDg3jHrcxRLA/out_0.webp" alt="놀람">
+        <div class="card-info"><span class="badge b-shock">😮 놀람</span><div class="card-title">놀란 표정</div><div class="model-tag">InstantID</div></div></div>
+    </div>
+    <div class="result-note"><p>얼굴이 원본과 매우 유사하지만 <strong>눈 크기·입 모양 변화가 거의 없어요</strong></p></div>
+  </div>
+
+  <!-- V2 -->
+  <div class="panel" id="panel-v2">
+    <div class="section-title">PhotoMaker — 얼굴 유사도 ⭐⭐⭐ / 감정 과장 ⭐⭐⭐⭐</div>
+    <div class="grid">
+      <div class="card"><img src="https://replicate.delivery/xezq/ZOIZM8EOO27qOF7TwUaogAd1VaACQkhBSHMje3FiKiTYfijWA/image_0.png" alt="슬픔">
+        <div class="card-info"><span class="badge b-sad">😢 슬픔</span><div class="card-title">슬픈 표정</div><div class="model-tag">PhotoMaker</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/YOWPFswf6RQBYyalUam6iU5pBXBurBzXHTZ0CZoNxuxafijWA/image_0.png" alt="설렘">
+        <div class="card-info"><span class="badge b-love">😍 설렘</span><div class="card-title">설레는 표정</div><div class="model-tag">PhotoMaker</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/ne9VeWeItrPbfTVFgszrf2KzcFE1OQLMwmvyUBvERye5qv4oF/image_0.png" alt="화남">
+        <div class="card-info"><span class="badge b-angry">😤 화남</span><div class="card-title">화난 표정</div><div class="model-tag">PhotoMaker</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/FGJCwMoFUf2sY6trpimAPx5FOmf9iFWREItDYireZOO09FHtA/image_0.png" alt="놀람">
+        <div class="card-info"><span class="badge b-shock">😮 놀람</span><div class="card-title">놀란 표정</div><div class="model-tag">PhotoMaker</div></div></div>
+    </div>
+    <div class="result-note"><p>눈/입 과장이 있지만 <strong>원본 얼굴과 다소 차이가 있어요</strong></p></div>
+  </div>
+
+  <!-- V3 조합 -->
+  <div class="panel" id="panel-v3">
+    <div class="section-title">✨ InstantID → PhotoMaker 2단계 조합 — 얼굴 유사도 ⭐⭐⭐⭐ / 감정 과장 ⭐⭐⭐⭐⭐</div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <img class="flow-img" src="/Users/seobang/Downloads/me01.jpeg"
+          onerror="this.style.background='#E8F4FF'; this.style.display='flex'; this.alt='📷';"
+          alt="원본 사진" style="background:#EBF5FF; display:flex; align-items:center; justify-content:center; font-size:32px;">
+        <div class="flow-label">① 원본 사진</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <img class="flow-img" src="https://replicate.delivery/xezq/PV59G6U0mZY4DJZf2SiucWEw1E81gj5OU2zTuMJ3fl4cyijWA/out_0.webp" alt="InstantID">
+        <div class="flow-label">② InstantID<br>기본 캐릭터</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <img class="flow-img" src="https://replicate.delivery/xezq/vSlWQkAzUZogKRcvZsfL3yNZBd1qxT1c2RaFzZ4rIF7XhxRLA/image_0.png" alt="최종">
+        <div class="flow-label">③ PhotoMaker<br>감정 과장</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><img src="https://replicate.delivery/xezq/vSlWQkAzUZogKRcvZsfL3yNZBd1qxT1c2RaFzZ4rIF7XhxRLA/image_0.png" alt="슬픔">
+        <div class="card-info"><span class="badge b-sad">😢 슬픔</span><div class="card-title">슬픈 표정</div><div class="model-tag">InstantID + PhotoMaker</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/QHrhtMRxzAqDDJaHj3qAtn38J0UkxSL84Ai11q1FopRzw4oF/image_0.png" alt="설렘">
+        <div class="card-info"><span class="badge b-love">😍 설렘</span><div class="card-title">설레는 표정</div><div class="model-tag">InstantID + PhotoMaker</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/yVjWo6H3jnIgDBdZXDXXV9xQPtOLedncxZdHeAn534wdDjjWA/image_0.png" alt="화남">
+        <div class="card-info"><span class="badge b-angry">😤 화남</span><div class="card-title">화난 표정</div><div class="model-tag">InstantID + PhotoMaker</div></div></div>
+      <div class="card"><img src="https://replicate.delivery/xezq/aEj7eZGqgdWBQ6MXarNF4N3ufJDYEhzDjJXr4keB4l7aHGHtA/image_0.png" alt="놀람">
+        <div class="card-info"><span class="badge b-shock">😮 놀람</span><div class="card-title">놀란 표정</div><div class="model-tag">InstantID + PhotoMaker</div></div></div>
+    </div>
+    <div class="result-note">
+      <p><span class="win">✅ 추천 방식!</span> InstantID로 얼굴을 먼저 캐릭터화 →<br>
+      그 결과물로 PhotoMaker가 <strong>눈/입을 과장</strong>하여 감정 표현<br>
+      💰 비용: ~$0.05(InstantID) + ~$0.05×4(PhotoMaker) = 약 <strong>$0.25 (350원)</strong>/세트</p>
+    </div>
+  </div>
+
+<script>
+function switchTab(v) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0&&v==='v1')||(i===1&&v==='v2')||(i===2&&v==='v3'));
+  });
+  ['v1','v2','v3'].forEach(id => {
+    document.getElementById('panel-'+id).classList.toggle('active', id===v);
+  });
+}
+</script>
+</body>
+</html>
