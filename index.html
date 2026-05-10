@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FF6B9D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>iStoryToon 🌸</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 앱 래퍼 -->
+  <div id="app">
+
+    <!-- 스플래시 스크린 -->
+    <div id="splash-screen" class="splash">
+      <div class="splash-logo">🌸</div>
+      <div class="splash-title">iStoryToon</div>
+      <div class="splash-subtitle">우리 가족의 이야기를 만화로</div>
+    </div>
+
+    <!-- 메인 화면 -->
+    <div id="main-screen" class="screen hidden">
+
+      <!-- 상단 헤더 -->
+      <header class="app-header">
+        <div class="header-logo">🌸 iStoryToon</div>
+        <button class="btn-icon" id="btn-my-toots">
+          <span>📚</span>
+        </button>
+      </header>
+
+      <!-- 히어로 섹션 -->
+      <section class="hero-section">
+        <h1 class="hero-title">우리 가족의 이야기를<br><span class="highlight">만화로 만들어드려요</span></h1>
+        <p class="hero-desc">소중한 순간을 입력하면 AI가 감동적인 만화로 만들어 드립니다</p>
+      </section>
+
+      <!-- 스토리 입력 카드 -->
+      <section class="input-section">
+        <div class="card input-card">
+          <div class="card-label">📝 어떤 이야기를 만화로 만들까요?</div>
+          <textarea
+            id="story-input"
+            class="story-textarea"
+            placeholder="예) 첫 만남부터 결혼까지 우리 이야기, 아이가 처음 말을 했을 때, 부모님의 오래된 사진을 발견했을 때..."
+            maxlength="500"
+          ></textarea>
+          <div class="textarea-footer">
+            <span id="char-count" class="char-count">0 / 500</span>
+          </div>
+        </div>
+
+        <!-- 스타일 선택 -->
+        <div class="card style-card">
+          <div class="card-label">🎨 만화 스타일</div>
+          <div class="style-grid" id="style-selector">
+            <button class="style-btn active" data-style="shoujo">
+              <span class="style-emoji">💜</span>
+              <span class="style-name">애니메이션</span>
+              <span class="style-desc">감성 순정만화</span>
+            </button>
+            <button class="style-btn" data-style="webtoon">
+              <span class="style-emoji">🟦</span>
+              <span class="style-name">웹툰</span>
+              <span class="style-desc">한국 웹툰풍</span>
+            </button>
+            <button class="style-btn" data-style="disney">
+              <span class="style-emoji">🏰</span>
+              <span class="style-name">디즈니</span>
+              <span class="style-desc">3D 애니메이션</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 등장인물 사진 업로드 -->
+        <div class="card character-card">
+          <div class="card-label">📸 등장인물 사진 <span style="font-weight:400;color:var(--text-muted);">(선택 · 참고용)</span></div>
+          <div class="character-list" id="character-list">
+
+            <!-- 등장인물 1 -->
+            <div class="character-item" id="char-1">
+              <div class="char-photo-wrap" onclick="document.getElementById('char-input-1').click()">
+                <div class="char-photo-default" id="char-photo-1">
+                  <span class="char-emoji">🧑</span>
+                  <span class="char-add-text">사진 추가</span>
+                </div>
+                <img class="char-photo-img hidden" id="char-img-1" alt="등장인물1">
+                <input type="file" id="char-input-1" accept="image/*" style="display:none" onchange="handleCharPhoto(1, this)">
+              </div>
+              <div class="char-info">
+                <input class="char-name-input" id="char-name-1" type="text" placeholder="이름 (예: 나)" maxlength="10">
+                <div class="char-badge" id="char-badge-1">미설정</div>
+              </div>
+              <button class="char-clear-btn hidden" id="char-clear-1" onclick="clearCharPhoto(1)">✕</button>
+            </div>
+
+            <!-- 등장인물 2 -->
+            <div class="character-item" id="char-2">
+              <div class="char-photo-wrap" onclick="document.getElementById('char-input-2').click()">
+                <div class="char-photo-default" id="char-photo-2">
+                  <span class="char-emoji">🧑</span>
+                  <span class="char-add-text">사진 추가</span>
+                </div>
+                <img class="char-photo-img hidden" id="char-img-2" alt="등장인물2">
+                <input type="file" id="char-input-2" accept="image/*" style="display:none" onchange="handleCharPhoto(2, this)">
+              </div>
+              <div class="char-info">
+                <input class="char-name-input" id="char-name-2" type="text" placeholder="이름 (예: 상대방)" maxlength="10">
+                <div class="char-badge" id="char-badge-2">미설정</div>
+              </div>
+              <button class="char-clear-btn hidden" id="char-clear-2" onclick="clearCharPhoto(2)">✕</button>
+            </div>
+
+          </div>
+          <div class="char-hint">💡 사진은 이름·분위기 참고용이에요. 만화는 AI가 예쁘게 자동 생성해요 🎨</div>
+        </div>
+
+        <!-- 컷 수 선택 -->
+        <div class="card cuts-card">
+          <div class="card-label">📖 컷 수</div>
+          <div class="cuts-selector" id="cuts-selector">
+            <button class="cut-btn" data-cuts="4">4컷</button>
+            <button class="cut-btn active" data-cuts="6">6컷</button>
+            <button class="cut-btn" data-cuts="8">8컷</button>
+          </div>
+        </div>
+
+        <!-- 생성 버튼 -->
+        <button class="btn-primary" id="btn-generate">
+          <span class="btn-icon-emoji">✨</span>
+          <span>만화 만들기</span>
+        </button>
+      </section>
+
+      <!-- 최근 만화 -->
+      <section class="recent-section" id="recent-section">
+        <div class="section-title">📚 최근 만든 만화</div>
+        <div id="recent-list" class="recent-list"></div>
+      </section>
+
+    </div>
+
+    <!-- 로딩 화면 -->
+    <div id="loading-screen" class="screen hidden">
+      <div class="loading-content">
+        <div class="loading-emoji">🌸</div>
+        <div class="loading-steps">
+          <div class="step" id="step-story">
+            <span class="step-icon">⏳</span>
+            <span class="step-text">스토리 분석 중...</span>
+          </div>
+          <div class="step" id="step-panels">
+            <span class="step-icon">⏳</span>
+            <span class="step-text">장면 구성 중...</span>
+          </div>
+          <div class="step" id="step-images">
+            <span class="step-icon">⏳</span>
+            <span class="step-text">이미지 생성 중...</span>
+          </div>
+        </div>
+        <div class="loading-tip" id="loading-tip">💡 첫 생성은 AI 모델 준비로 2~3분 걸려요. 잠시만 기다려주세요 🙏</div>
+      </div>
+    </div>
+
+    <!-- 만화 뷰어 화면 -->
+    <div id="viewer-screen" class="screen hidden">
+      <header class="viewer-header">
+        <button class="btn-back" id="btn-back">←</button>
+        <div class="viewer-title" id="viewer-title"></div>
+        <button class="btn-icon" id="btn-share">📤</button>
+      </header>
+      <div id="toon-viewer" class="toon-viewer"></div>
+      <div class="viewer-footer">
+        <button class="btn-secondary" id="btn-regenerate">🔄 다시 만들기</button>
+        <button class="btn-primary" id="btn-save">💾 저장하기</button>
+      </div>
+    </div>
+
+    <!-- 내 만화 목록 화면 -->
+    <div id="library-screen" class="screen hidden">
+      <header class="app-header">
+        <button class="btn-back" id="btn-back-library">←</button>
+        <div class="header-logo">📚 내 만화</div>
+        <div></div>
+      </header>
+      <div id="library-list" class="library-list"></div>
+    </div>
+
+  </div>
+
+  <!-- 토스트 메시지 -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- 환경변수 (빌드 시 주입) -->
+  <script src="env.js"></script>
+
+  <!-- 등장인물 사진 핸들러 -->
+  <script>
+    // 등장인물 데이터 저장소
+    window.characterData = { 1: null, 2: null };
+
+    function handleCharPhoto(idx, input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+
+        // 이미지 표시
+        const img = document.getElementById('char-img-' + idx);
+        const def = document.getElementById('char-photo-' + idx);
+        const clearBtn = document.getElementById('char-clear-' + idx);
+        const badge = document.getElementById('char-badge-' + idx);
+
+        img.src = dataUrl;
+        img.classList.remove('hidden');
+        def.style.display = 'none';
+        clearBtn.classList.remove('hidden');
+        badge.textContent = '사진 등록됨';
+        badge.classList.add('set');
+
+        // 상태 저장 (리사이즈 후)
+        resizeForUpload(dataUrl).then(resized => {
+          const name = document.getElementById('char-name-' + idx).value || `등장인물${idx}`;
+          window.characterData[idx] = { dataUrl: resized, name, file };
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearCharPhoto(idx) {
+      const img = document.getElementById('char-img-' + idx);
+      const def = document.getElementById('char-photo-' + idx);
+      const clearBtn = document.getElementById('char-clear-' + idx);
+      const badge = document.getElementById('char-badge-' + idx);
+      const input = document.getElementById('char-input-' + idx);
+
+      img.src = '';
+      img.classList.add('hidden');
+      def.style.display = '';
+      clearBtn.classList.add('hidden');
+      badge.textContent = '미설정';
+      badge.classList.remove('set');
+      input.value = '';
+      window.characterData[idx] = null;
+    }
+
+    function resizeForUpload(dataUrl, maxSize = 768) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+          const w = Math.round(img.width * scale);
+          const h = Math.round(img.height * scale);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.src = dataUrl;
+      });
+    }
+  </script>
+
+  <!-- 모듈 스크립트 -->
+  <script type="module" src="main.js"></script>
+
+</body>
+</html>
